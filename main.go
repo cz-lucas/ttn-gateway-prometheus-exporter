@@ -2,13 +2,11 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -22,16 +20,8 @@ func main() {
 	// Prometheus
 	InitPrometheus()
 
-	// Serve Prometheus metrics at :2112/metrics
-	http.Handle("/metrics", promhttp.Handler())
-	go func() {
-		log.Println("Prometheus metrics available at :2112/metrics")
-		log.Fatal(http.ListenAndServe(":2112", nil))
-	}()
-
 	// Read interval
 	intervalInSeconds, err := strconv.Atoi(os.Getenv("READ_INTERVAL"))
-
 	if err != nil {
 		log.Fatal("Invalid READ_INTERVAL:", err)
 	}
@@ -40,24 +30,19 @@ func main() {
 	defer ticker.Stop()
 
 	// Main loop
-	for {
-		select {
-		case <-ticker.C:
-			start := time.Now()
+	for range ticker.C {
+		start := time.Now()
 
-			// Simulate API call
-			response, err := apiService.Get()
+		response, err := apiService.Get()
+		apiCallsTotal.Inc()
 
-			apiCallsTotal.Inc()
-
-			if err != nil {
-				apiCallFailures.Inc()
-			} else {
-				log.Println(response)
-			}
-
-			duration := time.Since(start).Seconds()
-			lastApiCallDuration.Set(duration)
+		if err != nil {
+			apiCallFailures.Inc()
+		} else {
+			log.Println(response)
 		}
+
+		duration := time.Since(start).Seconds()
+		lastApiCallDuration.Set(duration)
 	}
 }
