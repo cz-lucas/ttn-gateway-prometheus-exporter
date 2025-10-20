@@ -1,13 +1,10 @@
 package main
 
 import (
-	"log"
-	"net/http"
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -33,7 +30,8 @@ var (
 	)
 )
 
-func InitPrometheus() {
+// InitPrometheus returns a custom registry
+func InitPrometheus() *prometheus.Registry {
 	enableRuntimeMetrics := os.Getenv("ENABLE_RUNTIME_METRICS") == "true"
 
 	// Create a new custom registry
@@ -45,16 +43,9 @@ func InitPrometheus() {
 	reg.MustRegister(lastApiCallDuration)
 
 	if enableRuntimeMetrics {
-		// Conditionally register Go runtime and process metrics
 		reg.MustRegister(collectors.NewGoCollector())
 		reg.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 	}
 
-	// Use the custom registry in the handler
-	http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-
-	go func() {
-		log.Println("Metrics server started at :2112/metrics")
-		log.Fatal(http.ListenAndServe(":2112", nil))
-	}()
+	return reg
 }
