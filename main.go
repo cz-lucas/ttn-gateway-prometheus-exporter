@@ -14,6 +14,16 @@ func main() {
 
 	godotenv.Load(".env")
 
+	if !keyExistsInConfig("TTN_GATEWAY_ID") {
+		log.Fatalln("The TTN_GATEWAY_ID is not configured")
+		os.Exit(-1)
+	}
+
+	if !keyExistsInConfig("TTN_API_KEY") {
+		log.Fatalln("The TTN_API_KEY is not configured")
+		os.Exit(-1)
+	}
+
 	// Get URL
 	var ttnRequestUrl = getEnvString("TTN_BASE_URL", "https://eu1.cloud.thethings.network/api/v3/gs/gateways/")
 	ttnRequestUrl += os.Getenv("TTN_GATEWAY_ID")

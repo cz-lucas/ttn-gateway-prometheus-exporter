@@ -6,6 +6,14 @@ import (
 	"strconv"
 )
 
+func keyExistsInConfig(name string) bool {
+	val := os.Getenv(name)
+	if val == "" {
+		return false
+	}
+	return true
+}
+
 func getEnvBool(name string, defaultVal bool) (bool, error) {
 	val := os.Getenv(name)
 	if val == "" {
