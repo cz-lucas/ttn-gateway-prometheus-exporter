@@ -8,10 +8,7 @@ import (
 
 func keyExistsInConfig(name string) bool {
 	val := os.Getenv(name)
-	if val == "" {
-		return false
-	}
-	return true
+	return val != ""
 }
 
 func getEnvBool(name string, defaultVal bool) (bool, error) {
@@ -23,7 +20,7 @@ func getEnvBool(name string, defaultVal bool) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("invalid %s: %w", name, err)
 	}
-	return i, nil
+	return i, err
 }
 
 func getEnvInt(name string, defaultVal int) (int, error) {
