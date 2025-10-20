@@ -12,7 +12,12 @@ type HttpService struct {
 }
 
 // NewHttpService initializes the service with an address
-func NewHttpService(addr string) *HttpService {
+func NewHttpService(addrs ...string) *HttpService {
+	addr := ":9000" // default value
+	if len(addrs) > 0 && addrs[0] != "" {
+		addr = addrs[0]
+	}
+
 	return &HttpService{
 		addr: addr,
 		mux:  http.NewServeMux(),
