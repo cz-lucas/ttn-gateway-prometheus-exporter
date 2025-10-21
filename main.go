@@ -24,9 +24,11 @@ func main() {
 		os.Exit(-1)
 	}
 
+	var gatewayId string = os.Getenv("TTN_GATEWAY_ID")
+
 	// Get URL
 	var ttnRequestUrl = getEnvString("TTN_BASE_URL", "https://eu1.cloud.thethings.network/api/v3/gs/gateways/")
-	ttnRequestUrl += os.Getenv("TTN_GATEWAY_ID")
+	ttnRequestUrl += gatewayId
 	ttnRequestUrl += getEnvString("TTN_URL_STATS_SUFFIX", "/connection/stats")
 	var apiService = NewTTNApiService(ttnRequestUrl, os.Getenv("TTN_API_KEY"))
 
@@ -64,7 +66,18 @@ func main() {
 		if err != nil {
 			apiCallFailures.Inc()
 		} else {
-			log.Println(response)
+			log.Println(gatewayId)
+			//log.Println(response)
+
+			// Set values in prometheus
+			numberOfDownlinkMessages.WithLabelValues(gatewayId).Set(float64(response.RoundTripTimes.Count))
+			uplinkMessages, _ := response.GetUplinkCount() // TODO: error handling
+			numberOfUplinkMessages.WithLabelValues(gatewayId).Set(uplinkMessages)
+
+			min, max, median, _ := response.RoundTripTimes.ConvertToSeconds() // TODO: error handling
+			rtt_min.WithLabelValues(gatewayId).Set(min)
+			rtt_median.WithLabelValues(gatewayId).Set(median)
+			rtt_max.WithLabelValues(gatewayId).Set(float64(max))
 		}
 
 		duration := time.Since(start).Seconds()

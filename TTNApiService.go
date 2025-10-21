@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -43,7 +44,7 @@ func (ttn *TTNApiService) Get() (GatewayStats, error) {
 	if err != nil {
 		return GatewayStats{}, fmt.Errorf("reading response body: %w", err)
 	}
-
+	log.Println(string(body))
 	var stats GatewayStats
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return GatewayStats{}, fmt.Errorf("unmarshalling response: %w", err)
