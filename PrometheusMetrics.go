@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// App metrics
 	apiCallsTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "api_calls_total",
@@ -20,10 +21,10 @@ var (
 		},
 	)
 
-	averageApiCallDuration = prometheus.NewGauge(
+	lastApiCallDuration = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Name: "api_call_duration_seconds",
-			Help: "The average duration of the API calls to the TTN in seconds",
+			Name: "last_api_call_duration_seconds",
+			Help: "The duration of the last API call to the TTN in seconds",
 		},
 	)
 )
@@ -37,7 +38,7 @@ func InitPrometheus(enableRuntimeMetrics bool, enableAppMetrics bool) *prometheu
 		// Register your app's custom metrics
 		reg.MustRegister(apiCallsTotal)
 		reg.MustRegister(apiCallFailures)
-		reg.MustRegister(averageApiCallDuration)
+		reg.MustRegister(lastApiCallDuration)
 	}
 
 	if enableRuntimeMetrics {

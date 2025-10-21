@@ -56,7 +56,7 @@ func main() {
 
 	// Main loop
 	for range ticker.C {
-		//start := time.Now()
+		start := time.Now()
 
 		response, err := apiService.Get()
 		apiCallsTotal.Inc()
@@ -67,7 +67,7 @@ func main() {
 			log.Println(response)
 		}
 
-		//duration := time.Since(start).Seconds()
-		//lastApiCallDuration.Set(duration)
+		duration := time.Since(start).Seconds()
+		lastApiCallDuration.Set(duration)
 	}
 }
