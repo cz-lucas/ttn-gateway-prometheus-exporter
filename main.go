@@ -26,6 +26,9 @@ func main() {
 
 	var gatewayId string = os.Getenv("TTN_GATEWAY_ID")
 
+	log.Printf("Starting TTN-Gateway-Prometheus-exporter\n")
+	log.Printf("GatewayID: %s \n", gatewayId)
+
 	// Get URL
 	var ttnRequestUrl = getEnvString("TTN_BASE_URL", "https://eu1.cloud.thethings.network/api/v3/gs/gateways/")
 	ttnRequestUrl += gatewayId
@@ -62,12 +65,14 @@ func main() {
 
 		response, err := apiService.Get()
 		apiCallsTotal.Inc()
+		log.Println("Getting gateway-statistics")
 
 		if err != nil {
 			apiCallFailures.Inc()
+			log.Fatalln("Request to the TTN failed")
+			log.Fatalln(err)
 		} else {
-			log.Println(gatewayId)
-			//log.Println(response)
+			log.Println(response)
 
 			// Set values in prometheus
 			numberOfDownlinkMessages.WithLabelValues(gatewayId).Set(float64(response.RoundTripTimes.Count))
@@ -81,6 +86,7 @@ func main() {
 		}
 
 		duration := time.Since(start).Seconds()
+		log.Printf("Done (Last request duration: %.5fs) \n", duration)
 		lastApiCallDuration.Set(duration)
 	}
 }
