@@ -16,12 +16,16 @@ func main() {
 
 	if !keyExistsInConfig("TTN_GATEWAY_ID") {
 		log.Fatalln("The TTN_GATEWAY_ID is not configured")
-		os.Exit(-1)
 	}
 
 	if !keyExistsInConfig("TTN_API_KEY") {
 		log.Fatalln("The TTN_API_KEY is not configured")
-		os.Exit(-1)
+	}
+
+	// Read interval
+	intervalInSeconds, err := getEnvInt("READ_INTERVAL", 600)
+	if err != nil {
+		log.Fatalln("READ_INTERVAL is not a number")
 	}
 
 	var gatewayId string = os.Getenv("TTN_GATEWAY_ID")
@@ -53,9 +57,6 @@ func main() {
 	// Start the HTTP service
 	httpService.Start()
 
-	// Read interval
-	intervalInSeconds, _ := getEnvInt("READ_INTERVAL", 600)
-
 	ticker := time.NewTicker(time.Duration(intervalInSeconds) * time.Second)
 	defer ticker.Stop()
 
@@ -69,17 +70,31 @@ func main() {
 
 		if err != nil {
 			apiCallFailures.Inc()
-			log.Fatalln("Request to the TTN failed")
-			log.Fatalln(err)
+			log.Printf("ERROR: Request to the TTN failed: %v", err)
+			continue
 		} else {
 			log.Println(response)
 
 			// Set values in prometheus
 			numberOfDownlinkMessages.WithLabelValues(gatewayId).Set(float64(response.RoundTripTimes.Count))
-			uplinkMessages, _ := response.GetUplinkCount() // TODO: error handling
-			numberOfUplinkMessages.WithLabelValues(gatewayId).Set(uplinkMessages)
+			uplinkMessages, err := response.GetUplinkCount()
 
-			min, max, median, _ := response.RoundTripTimes.ConvertToSeconds() // TODO: error handling
+			if err != nil {
+				log.Printf("WARNING: Failed to parse uplink count: %v", err)
+				continue
+			} else {
+				numberOfUplinkMessages.WithLabelValues(gatewayId).Set(uplinkMessages)
+			}
+
+			min, max, median, err := response.RoundTripTimes.ConvertToSeconds()
+
+			if err != nil {
+				log.Printf("WARNING: Failed to parse rtt values: %v", err)
+				continue
+			} else {
+				numberOfUplinkMessages.WithLabelValues(gatewayId).Set(uplinkMessages)
+			}
+
 			rtt_min.WithLabelValues(gatewayId).Set(min)
 			rtt_median.WithLabelValues(gatewayId).Set(median)
 			rtt_max.WithLabelValues(gatewayId).Set(float64(max))

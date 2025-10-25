@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 )
 
 // HttpService struct
@@ -32,8 +33,11 @@ func (s *HttpService) RegisterRoute(pattern string, handler http.Handler) {
 // Start launches the HTTP server
 func (s *HttpService) Start() error {
 	go func() {
-		log.Printf("Metrics server started at %s\n", s.addr)
-		log.Fatal(http.ListenAndServe(s.addr, s.mux))
+		if err := http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("HTTP server error: %v", err)
+		}
 	}()
+	// Give it a moment to fail if port is in use
+	time.Sleep(250 * time.Millisecond)
 	return nil
 }

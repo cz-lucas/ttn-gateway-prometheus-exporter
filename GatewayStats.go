@@ -43,15 +43,15 @@ func (rtt *RoundTripTimes) ConvertToSeconds() (float64, float64, float64, error)
 	var err error
 	min, err := convertDurationToSeconds(rtt.Min)
 	if err != nil {
-		return -1.0, -1.0, -1.0, fmt.Errorf("error parsing min duration: %v", err)
+		return 0.0, 0.0, 0.0, fmt.Errorf("error parsing min duration: %v", err)
 	}
 	max, err := convertDurationToSeconds(rtt.Max)
 	if err != nil {
-		return -1.0, -1.0, -1.0, fmt.Errorf("error parsing max duration: %v", err)
+		return 0.0, 0.0, 0.0, fmt.Errorf("error parsing max duration: %v", err)
 	}
 	median, err := convertDurationToSeconds(rtt.Median)
 	if err != nil {
-		return -1.0, -1.0, -1.0, fmt.Errorf("error parsing median duration: %v", err)
+		return 0.0, 0.0, 0.0, fmt.Errorf("error parsing median duration: %v", err)
 	}
 	return min, median, max, nil
 }
@@ -60,7 +60,7 @@ func (rtt *RoundTripTimes) ConvertToSeconds() (float64, float64, float64, error)
 func convertDurationToSeconds(durationStr string) (float64, error) {
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
-		return -1, err
+		return 0.0, err
 	}
 	// Convert to seconds and return as float64
 	return duration.Seconds(), nil
