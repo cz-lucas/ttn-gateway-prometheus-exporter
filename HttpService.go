@@ -33,7 +33,7 @@ func (s *HttpService) RegisterRoute(pattern string, handler http.Handler) {
 // Start launches the HTTP server
 func (s *HttpService) Start() error {
 	go func() {
-		if err := http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := http.ListenAndServe(s.addr, s.mux); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("HTTP server error: %v", err)
 		}
 	}()

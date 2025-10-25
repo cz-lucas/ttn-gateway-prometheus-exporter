@@ -33,9 +33,9 @@ func TestRoundTripTimes_ConvertToSeconds(t *testing.T) {
 		}
 
 		min, median, max, err := rtt.ConvertToSeconds()
-		assert.Equal(t, min, -1.0)
-		assert.Equal(t, median, -1.0)
-		assert.Equal(t, max, -1.0)
+		assert.Equal(t, min, 0.0)
+		assert.Equal(t, median, 0.0)
+		assert.Equal(t, max, 0.0)
 
 		expected := "error parsing min duration: time: invalid duration \"i am a string\""
 		assert.EqualError(t, err, expected)
@@ -51,9 +51,9 @@ func TestRoundTripTimes_ConvertToSeconds(t *testing.T) {
 		}
 
 		min, median, max, err := rtt.ConvertToSeconds()
-		assert.Equal(t, min, -1.0)
-		assert.Equal(t, median, -1.0)
-		assert.Equal(t, max, -1.0)
+		assert.Equal(t, min, 0.0)
+		assert.Equal(t, median, 0.0)
+		assert.Equal(t, max, 0.0)
 
 		expected := "error parsing median duration: time: invalid duration \"another string\""
 		assert.EqualError(t, err, expected)
@@ -69,9 +69,9 @@ func TestRoundTripTimes_ConvertToSeconds(t *testing.T) {
 		}
 
 		min, median, max, err := rtt.ConvertToSeconds()
-		assert.Equal(t, min, -1.0)
-		assert.Equal(t, median, -1.0)
-		assert.Equal(t, max, -1.0)
+		assert.Equal(t, min, 0.0)
+		assert.Equal(t, median, 0.0)
+		assert.Equal(t, max, 0.0)
 
 		expected := "error parsing max duration: time: invalid duration \"and another one\""
 		assert.EqualError(t, err, expected)
@@ -96,7 +96,7 @@ func Test_convertDurationToSeconds(t *testing.T) {
 	t.Run("Invalid time", func(t *testing.T) {
 
 		result, err := convertDurationToSeconds("fiftyoneseconds")
-		assert.Equal(t, result, -1.0)
+		assert.Equal(t, result, 0.0)
 
 		expected := "time: invalid duration \"fiftyoneseconds\""
 		assert.EqualError(t, err, expected)
