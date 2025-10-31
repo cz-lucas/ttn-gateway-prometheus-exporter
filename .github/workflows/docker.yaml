@@ -52,7 +52,3 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false # speeds up build slightly by skipping provenance attestation
-
-      # Output image info
-      - name: Print built image info
-        run: echo "Built image: czlucas/ttn-gateway-prometheus-exporter:${{ github.ref_name }}-${{ github.sha }}"
