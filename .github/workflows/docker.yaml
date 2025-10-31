@@ -30,7 +30,7 @@ jobs:
           push: true
           tags: |
               czlucas/ttn-gateway-prometheus-exporter:${{ github.ref_name }}-${{ github.sha }}
-              $.{{ github.ref_name == 'main' && 'czlucas/ttn-gateway-prometheus-exporter:latest' || '' }}
+              czlucas/ttn-gateway-prometheus-exporter:latest
           
     - name: COPY CONTAINER IMAGE NAME
       run: echo "CONTAINER IMAGE:" ${{ github.ref_name }}-${{ github.sha }}
