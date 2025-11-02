@@ -11,7 +11,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o exporter .
 
 # Final stage
-FROM busybox
+FROM alpine:latest
 
 WORKDIR /app
 
